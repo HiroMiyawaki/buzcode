@@ -184,11 +184,11 @@ if ~exist('spikeInfo', 'var')
     spikeInfo = 0;
 end
 
-
+[FO.basePath,FO.baseName]=fileparts(baseName)
 %These parameters are passed through all functions
 FO.downsampleGoal = 312.5;% display Hz goal, to save memory... will calculate downsample factor to match (ie 4 if 1250hz lfp file)
-FO.baseName = baseName;
-FO.basePath = pwd; %basePath is assumed to be pwd
+% FO.baseName = baseName;
+% FO.basePath = pwd; %basePath is assumed to be pwd
 FO.eegShow = 2; %show 2 seconds of eeg
 FO.maxFreq = 40; %default starting frequency extent
 FO.hanningW = 10; %default hanning smoothing window
@@ -805,19 +805,28 @@ spec = {};
 for I = 1:FO.nCh
     fo = [];
     s = [];
-    for i = 1:f1:(size(f{I}.spec, 2) - f1)
-        s = [s, mean(f{I}.spec(:, i:(i + f1 - 1), :), 2)];
-        fo = [fo; mean(f{I}.fo(i:(i + f1 - 1)))];
+    if f1~=1
+        for i = 1:f1:(size(f{I}.spec, 2) - f1)
+            s = [s, mean(f{I}.spec(:, i:(i + f1 - 1), :), 2)];
+            fo = [fo; mean(f{I}.fo(i:(i + f1 - 1)))];
+        end
+        spec{I} = s;
+    else
+        spec{I} = f{I}.spec(:,1:end-1);
+        fo = f{I}.fo(1:end-1);
     end
-    spec{I} = s;
 end
 
+% for i = 1:length(f)
+%     n = prctile(reshape(f{i}.spec, 1, []), [1, 99]);
+%     f{i}.spec(f{i}.spec < n(1)) = n(1);
+%     f{i}.spec(f{i}.spec > n(2)) = n(2);
+% end
 for i = 1:length(f)
-    n = prctile(reshape(f{i}.spec, 1, []), [1, 99]);
-    f{i}.spec(f{i}.spec < n(1)) = n(1);
-    f{i}.spec(f{i}.spec > n(2)) = n(2);
+    n = prctile(spec{i}(:), [1, 99]);
+    spec{i}(spec{i} < n(1)) = n(1);
+    spec{i}(spec{i} > n(2)) = n(2);
 end
-
 FO.unsmoothedSpec = spec;
 FO.originalFO = f{1}.fo;
 
@@ -6000,3 +6009,9 @@ for n = 1:nargin
 end
 
 end
+
+
+function date=today
+date=floor(now);
+end
+

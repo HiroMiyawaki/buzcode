@@ -16,4 +16,5 @@ notesname = [basename,'_AnimalMetadataText'];
 notesfullpath = fullfile(basepath,notesname);
 prompt = 'Push any key in this window when done editing the NoteText file ';
 str = input(prompt,'s');
+clear(notesfullpath)
 run(notesfullpath);

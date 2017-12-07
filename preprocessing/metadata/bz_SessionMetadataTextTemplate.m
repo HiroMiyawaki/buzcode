@@ -34,7 +34,8 @@ basename = bz_BasenameFromBasepath(basepath);
 
 %% HUMAN INPUT BELOW
 % Preprocessing specifiers
-SessionMetadata.Preprocess.AnimalMetadataSource = {'AnimalFolderAbove'};
+% SessionMetadata.Preprocess.AnimalMetadataSource = {'AnimalFolderAbove'};
+SessionMetadata.Preprocess.AnimalMetadataSource = {''};
 
 % Surgery and Animal metadata
 SessionMetadata.Animal.WeightGrams = [];
@@ -46,12 +47,16 @@ SessionMetadata.ExtracellEphys.BadShanks = [];% vector for this recording. base 
      % These bad shanks will be used to populate bad channels
 SessionMetadata.ExtracellEphys.BadChannels = [];% vector for this recording. base 0
 SessionMetadata.ExtracellEphys.ChannelNotes = {''};
-SessionMetadata.ExtracellEphys.SpikeGroups = {'FromAnimalMetaData','FromXML'}; %Pick one, delete the other.
+% SessionMetadata.ExtracellEphys.SpikeGroups = {'FromAnimalMetaData','FromXML'}; %Pick one, delete the other.
+SessionMetadata.ExtracellEphys.SpikeGroups = {'FromXML'}; %Pick one, delete the other.
 
 SessionMetadata.ExtracellEphys.Parameters.LfpSampleRate = 1250;%assumed default
-SessionMetadata.ExtracellEphys.Parameters.PointsPerWaveform = 32;%default
-SessionMetadata.ExtracellEphys.Parameters.PeakPointInWaveform = 16;%default
-SessionMetadata.ExtracellEphys.Parameters.FeaturesPerWave = 4;%default
+% SessionMetadata.ExtracellEphys.Parameters.PointsPerWaveform = 32;%default
+SessionMetadata.ExtracellEphys.Parameters.PointsPerWaveform = 41;%default
+% SessionMetadata.ExtracellEphys.Parameters.PeakPointInWaveform = 16;%default
+SessionMetadata.ExtracellEphys.Parameters.PeakPointInWaveform = 17;%default
+% SessionMetadata.ExtracellEphys.Parameters.FeaturesPerWave = 4;%default
+SessionMetadata.ExtracellEphys.Parameters.FeaturesPerWave = 3;%default
 
 % Optogenetics metadata
 % FiberNum = 1;%copy more of these blocks - one per probe
@@ -121,8 +126,10 @@ if ~exist('inputamdpath','var')
         guessamdpath = fullfile(supradir,d2(1).name);
     else%if cannot be found, ask user 
         disp('No local AnimalMetadata.mat found');
+        [FileName,PathName] = uigetfile(FilterSpec);
+        guessamdpath=fullfile(FileName,PathName);
     end
-    inputamdpath = fullfile(PathName,FileName);
+    inputamdpath = guessamdpath;
 end
 
 if ~strcmp(inputamdpath,finalamdpath)

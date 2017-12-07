@@ -33,8 +33,8 @@ basename = bz_BasenameFromBasepath(basepath);
 %% HUMAN INPUT SECTION %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Name and path info
-AnimalMetadata.AnimalName = 'Ket1';
-AnimalMetadata.AnimalBasepath = '/balrog_zpool/Ket1';%this can be changed for each computer and can then act as a handle for all subsequent analyses
+AnimalMetadata.AnimalName = 'magician';
+AnimalMetadata.AnimalBasepath = '~/data/Fear/' ;%this can be changed for each computer and can then act as a handle for all subsequent analyses
 
 % Determine which modules to use for this animal... 1 for use, 0 for not use 
 AnimalMetadata.Modules.AnimalAndSurgery = 1;
@@ -47,22 +47,22 @@ AnimalMetadata.Modules.Imaging = 0;
 % Surgery and Animal metadata
 if AnimalMetadata.Modules.AnimalAndSurgery
     AnimalMetadata.Animal.Species = 'Rat';
-    AnimalMetadata.Animal.Strain = 'SpragueDawley';
+    AnimalMetadata.Animal.Strain = 'LongEvans';
     AnimalMetadata.Animal.GeneticLine = 'WildType';
     AnimalMetadata.Animal.Sex = 'Male';
-    AnimalMetadata.Animal.DateOfBirth = '20161221';%YYYYMMDD format
-    AnimalMetadata.Animal.WeightGramsAtSurgery = 405;%grams
+    AnimalMetadata.Animal.DateOfBirth = '20170707';%YYYYMMDD format
+    AnimalMetadata.Animal.WeightGramsAtSurgery = 370;%grams
 
-    AnimalMetadata.Surgery.Date = '20170317';
+    AnimalMetadata.Surgery.Date = '20170912';
     AnimalMetadata.Surgery.Anesthesia.Name = 'Isoflurane';
-    AnimalMetadata.Surgery.Anesthesia.ConcentrationPercent = '1';
-    AnimalMetadata.Surgery.Analgesic.Name = 'Buprenex';
-    AnimalMetadata.Surgery.Analgesic.Milligrams = 0.06;%usually given at 0.15mg/ml
-    AnimalMetadata.Surgery.Antibiotics.Topical = 'Neopredef';
+    AnimalMetadata.Surgery.Anesthesia.ConcentrationPercent = '1.5';
+    AnimalMetadata.Surgery.Analgesic.Name = '';
+    AnimalMetadata.Surgery.Analgesic.Milligrams = 0;%usually given at 0.15mg/ml
+    AnimalMetadata.Surgery.Antibiotics.Topical = '';
     AnimalMetadata.Surgery.Antibiotics.Intraperitoneal = '';
     AnimalMetadata.Surgery.Complications = '';
     AnimalMetadata.Surgery.DamageSites = '';
-    AnimalMetadata.Surgery.Notes = 'Good';
+    AnimalMetadata.Surgery.Notes = '';
 end
 
 % Extracell Ephys metadata
@@ -70,26 +70,26 @@ if AnimalMetadata.Modules.ExtracellEphys
     %On probe subfields below: if multiple probes, put in one entry in each field
     %per probe, make sure they align with each other properly and all
     %subsequent assumptions will work.
-    AnimalMetadata.ExtracellEphys.Probes.UmPerScrewTurn = [288 288];
+    AnimalMetadata.ExtracellEphys.Probes.UmPerScrewTurn = [280 280];
     AnimalMetadata.ExtracellEphys.Probes.NumberOfProbes = 2;
-    AnimalMetadata.ExtracellEphys.Probes.TargetRegions = {'dCA1','mPFC'};
-    AnimalMetadata.ExtracellEphys.Probes.TargetHemisphere = {'left','right'};
-    AnimalMetadata.ExtracellEphys.Probes.ImplantCoordinates.Anteroposterior = [-3.5,2.7];%one for each probe
-    AnimalMetadata.ExtracellEphys.Probes.ImplantCoordinates.Mediolateral = [2.5,0.3];
+    AnimalMetadata.ExtracellEphys.Probes.TargetRegions = {'Amy','mPFC'};
+    AnimalMetadata.ExtracellEphys.Probes.TargetHemisphere = {'right','right'};
+    AnimalMetadata.ExtracellEphys.Probes.ImplantCoordinates.Anteroposterior = [-2.76,3.24];%one for each probe
+    AnimalMetadata.ExtracellEphys.Probes.ImplantCoordinates.Mediolateral = [4.05,1];
     AnimalMetadata.ExtracellEphys.Probes.ImplantAngle.Anteroposterior = [0,0];%degrees of top anterior as sitting behind animal
-    AnimalMetadata.ExtracellEphys.Probes.ImplantAngle.Mediolateral = [0,10];%degrees clockwise as sitting behind animal
-    AnimalMetadata.ExtracellEphys.Probes.ImplantCoordinates.DepthFromSurface = [1.5,2];
-    AnimalMetadata.ExtracellEphys.Probes.OrientationOfProbe.FirstGroupRelativeToLastGroupClockwiseDegreesAnteriorIsZero = [90,135];%assumes linear arrays
+    AnimalMetadata.ExtracellEphys.Probes.ImplantAngle.Mediolateral = [-5,15];%degrees clockwise as sitting behind animal
+    AnimalMetadata.ExtracellEphys.Probes.ImplantCoordinates.DepthFromSurface = [7.08,1.8];
+    AnimalMetadata.ExtracellEphys.Probes.OrientationOfProbe.FirstGroupRelativeToLastGroupClockwiseDegreesAnteriorIsZero = [0,0];%assumes linear arrays
     AnimalMetadata.ExtracellEphys.Probes.OrientationOfProbe.GroupOffsetsFromCenter_ApMlDv = [];%for non-linear arrangements: group x 3 coordinates for change from center
     AnimalMetadata.ExtracellEphys.Probes.PluggingOrder = [1,2];% order will be represented in .xml, ie if intan splitter dicates
     AnimalMetadata.ExtracellEphys.Probes.SiteSizesInUmSq = [160];%In square microns
-    AnimalMetadata.ExtracellEphys.Probes.ProbeLayoutFilenames = {'NRX_Buzsaki64_5X12';'NRX_Buzsaki64_8X8'};%filenames in /buzcode/GeneralComputation/geometries
+    AnimalMetadata.ExtracellEphys.Probes.ProbeLayoutFilenames = {'Buzsaki32L';'Buzsaki64sp'};%filenames in /buzcode/GeneralComputation/geometries
     AnimalMetadata.ExtracellEphys.Channels.ImpedanceFilenames = {};%Filenames in basepath folder, or leave as {} if none
 
     %ONLY ENTER THIS MANUALLY IF YOU WOULD LIKE TO USE THE EXISTING .xml 
     %SPIKE GROUPS INSTEAD OF CALCULATING FROM A PROBE GEOMETRY FILE
     %Enter a list of spike group numbers (from neuroscope) for each probe
-    AnimalMetadata.ExtracellEphys.Probes.ProbeSpikegroups = {['spkgrps on probe1'],['spkgrps on probe 2']};
+    AnimalMetadata.ExtracellEphys.Probes.ProbeSpikegroups = {[1:4],[5:10]};
     
     
 %     AnimalMetadata.ExtracellEphys.CurrentBadChannels = [];

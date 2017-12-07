@@ -26,11 +26,13 @@ notesname = [basename,'_SessionMetadataText.m'];
 notesfullpath = fullfile(basepath,notesname);
 if ~exist(notesfullpath,'file')
     w = which('bz_SessionMetadataTextTemplate.m');% copy an example header here to edit
-    copyfile(w,notesname);
+%     copyfile(w,notesname);
+    copyfile(w,notesfullpath);
 end
 
-edit(notesname)
-
+% edit(notesname)
+edit(notesfullpath)
+date
 % prompt = 'Push any key in this window when done editing the NoteText file ';
 % str = input(prompt,'s');
 % run(notesname);%save _AnimalNotes.mat to disk
