@@ -168,19 +168,24 @@ try
         end
     end
     for a = 1:parameters.spikeGroups.nGroups
-        if ~isempty(parameters.spikeGroups.nSamples)
         parameters.SpkGrps(a).Channels = parameters.spikeGroups.groups{a};
-        parameters.SpkGrps(a).nSamples =  str2num(p.spikeDetection.channelGroups.group{a}.nSamples);
-        parameters.SpkGrps(a).PeakSample = str2num(p.spikeDetection.channelGroups.group{a}.peakSampleIndex); 
-        parameters.SpkGrps(a).nFeatures =  str2num(p.spikeDetection.channelGroups.group{a}.nFeatures); 
+        if isfield(parameters.spikeGroups,'nSamples') ~isempty(parameters.spikeGroups.nSamples)
+            parameters.SpkGrps(a).nSamples =  str2num(p.spikeDetection.channelGroups.group{a}.nSamples);
+            parameters.SpkGrps(a).PeakSample = str2num(p.spikeDetection.channelGroups.group{a}.peakSampleIndex);
+            parameters.SpkGrps(a).nFeatures =  str2num(p.spikeDetection.channelGroups.group{a}.nFeatures); 
         else
-            for b = 1:length(p.anatomicalDescription.channelGroups.group.channel)
-                parameters.SpkGrps(a).Channels(b) = str2num(p.anatomicalDescription.channelGroups.group.channel{b});
-                parameters.SpkGrps(a).nSamples =  [];
-                parameters.SpkGrps(a).PeakSample = [];
-                parameters.SpkGrps(a).nFeatures =  [];  
-            end
+            parameters.SpkGrps(a).nSamples = [];
+            parameters.SpkGrps(a).PeakSample = [];
+            parameters.SpkGrps(a).nFeatures = [];
         end
+%         else
+%             for b = 1:length(p.anatomicalDescription.channelGroups.group.channel)
+%                 parameters.SpkGrps(a).Channels(b) = str2num(p.anatomicalDescription.channelGroups.group.channel{b});
+%                 parameters.SpkGrps(a).nSamples =  [];
+%                 parameters.SpkGrps(a).PeakSample = [];
+%                 parameters.SpkGrps(a).nFeatures =  [];  
+%             end
+%         end
     end
 catch
   warning('could not load .SpkGrps and .AnatGrps, something may be missing from your XML file..') 
