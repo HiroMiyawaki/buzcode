@@ -41,7 +41,7 @@
 % the Free Software Foundation; either version 3 of the License, or
 % (at your option) any later version.
 
-function [ccg,t] = CCG(times,groups,varargin)
+function [ccg,t] = buzcode_CCG(times,groups,varargin)
 
 % Default values
 duration = 2;
