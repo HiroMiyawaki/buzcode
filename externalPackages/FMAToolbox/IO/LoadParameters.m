@@ -43,7 +43,7 @@ if ~strcmp(filename(end-3:end),'.xml') % we can now give LoadParameters.m the fo
     filename = fullfile(filename, d.name);
 end
 
-if ~exist(filename),
+if ~exist(filename,'file')
 	error(['File ''' filename ''' not found.']);
 end
 [pathname,basename,extension] = fileparts(filename);
@@ -68,13 +68,13 @@ if isempty(which('xmltree')),
 end
 
 
-if ~isempty(p.spikeDetection),
+if ~isempty(p.spikeDetection)
 	parameters.spikeGroups.nGroups = length(p.spikeDetection.channelGroups.group);
 	if parameters.spikeGroups.nGroups == 1,   %if there's a single spike group
 		parameters.spikeGroups.nSamples = str2num(p.spikeDetection.channelGroups.group.nSamples);
 		channels = p.spikeDetection.channelGroups.group.channels.channel;
-		if isa(channels,'cell'),
-			for channel = 1:length(channels),
+		if isa(channels,'cell')
+			for channel = 1:length(channels)
 				parameters.spikeGroups.groups{1}(channel) = str2num(channels{channel});
 			end
 		else
@@ -86,13 +86,13 @@ if ~isempty(p.spikeDetection),
          p.spikeDetection.channelGroups = rmfield(p.spikeDetection.channelGroups,'group');
          p.spikeDetection.channelGroups.group{1} = temp;  
 	else
-		for group = 1:parameters.spikeGroups.nGroups,
+		for group = 1:parameters.spikeGroups.nGroups
             if isfield(p.spikeDetection.channelGroups.group{group},'nSamples')
     			parameters.spikeGroups.nSamples(group) = str2num(p.spikeDetection.channelGroups.group{group}.nSamples);
             end
 			channels = p.spikeDetection.channelGroups.group{group}.channels.channel;
-			if isa(channels,'cell'),
-				for channel = 1:length(channels),
+			if isa(channels,'cell')
+				for channel = 1:length(channels)
 					parameters.spikeGroups.groups{group}(channel) = str2num(channels{channel});
 				end
 			else
@@ -169,7 +169,7 @@ try
     end
     for a = 1:parameters.spikeGroups.nGroups
         parameters.SpkGrps(a).Channels = parameters.spikeGroups.groups{a};
-        if isfield(parameters.spikeGroups,'nSamples') ~isempty(parameters.spikeGroups.nSamples)
+        if isfield(parameters.spikeGroups,'nSamples') && ~isempty(parameters.spikeGroups.nSamples)
             parameters.SpkGrps(a).nSamples =  str2num(p.spikeDetection.channelGroups.group{a}.nSamples);
             parameters.SpkGrps(a).PeakSample = str2num(p.spikeDetection.channelGroups.group{a}.peakSampleIndex);
             parameters.SpkGrps(a).nFeatures =  str2num(p.spikeDetection.channelGroups.group{a}.nFeatures); 
