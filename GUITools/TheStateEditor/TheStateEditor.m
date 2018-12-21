@@ -96,7 +96,7 @@
 
 
 
-function TheStateEditor(baseName, inputData, supressGUI, makePortable)
+function figHandle=TheStateEditor(baseName, inputData, supressGUI, makePortable)
 
 %% get baseName if doesn't exist, save
 
@@ -287,13 +287,52 @@ if FileExistsIn([baseName,'.eegstates.mat'])
     end
     if exist([baseName,'.SleepState.states.mat'],'file')
        load([baseName,'.SleepState.states.mat'])
-       stateslen = max([max(max(SleepState.ints.NREMstate)) max(max(SleepState.ints.REMstate)) max(max(SleepState.ints.WAKEstate)) max(max(SleepState.ints.MAstate))]); 
+%        stateslen = max([max(max(SleepState.ints.NREMstate)) max(max(SleepState.ints.REMstate)) max(max(SleepState.ints.WAKEstate)) max(max(SleepState.ints.MAstate))]); 
+%        states = zeros(1,stateslen);
+%        states(find(inttoboolIn(SleepState.ints.WAKEstate))) = 1;
+%        states(find(inttoboolIn(SleepState.ints.MAstate))) = 2;
+%        states(find(inttoboolIn(SleepState.ints.NREMstate))) = 3;
+%        states(find(inttoboolIn(SleepState.ints.REMstate))) = 5;
+%        states = cat(2,states,zeros(1,length(StateInfo.fspec{1}.to)-length(states)));
+        
+        % changed by Hiro Miyawaki, Dec 21, 2018
+        if ~isfield(SleepState,'timestamps')
+
+            if ~isempty(SleepState.ints.MAstate)
+                disp('WARNING : MA is merged to WAKE');
+            end
+            SleepState.timestamps.WAKE=sortrows([SleepState.ints.WAKEstate;SleepState.ints.MAstate]);
+            SleepState.timestamps.MA=[];
+            SleepState.timestamps.NREM=SleepState.ints.NREMstate;
+            SleepState.timestamps.IS=[];
+            SleepState.timestamps.REM=SleepState.ints.REMstate;
+            
+            scored=sortrows([SleepState.timestamps.NREM;
+                            SleepState.timestamps.REM;
+                            SleepState.timestamps.WAKE;
+                            SleepState.timestamps.MA;
+                            SleepState.timestamps.IS]);
+            
+            unScoreID=find(scored(1:end-1,2) ~= scored(2:end,1)); 
+            if ~isempty(unScoreID)
+                disp('WARNING : Assuming unscored epochs are WAKE')
+                unscored=[scored(unScoreID,2),scored(unScoreID+1,1)];
+                SleepState.timestamps.WAKE=sortrows([SleepState.timestamps.WAKE;unscored]);
+            end
+            
+        end
+               
+       stateslen = max([SleepState.timestamps.NREM(:);...
+                       SleepState.timestamps.REM(:);...
+                       SleepState.timestamps.WAKE(:);...
+                       SleepState.timestamps.MA(:);...
+                       SleepState.timestamps.IS(:)]); 
        states = zeros(1,stateslen);
-       states(find(inttoboolIn(SleepState.ints.WAKEstate))) = 1;
-       states(find(inttoboolIn(SleepState.ints.MAstate))) = 2;
-       states(find(inttoboolIn(SleepState.ints.NREMstate))) = 3;
-       states(find(inttoboolIn(SleepState.ints.REMstate))) = 5;
-       states = cat(2,states,zeros(1,length(StateInfo.fspec{1}.to)-length(states)));
+       states(find(inttoboolIn(SleepState.timestamps.IS))) = 2;
+       states(find(inttoboolIn(SleepState.timestamps.MA))) = 4;
+       states(find(inttoboolIn(SleepState.timestamps.WAKE))) = 1;
+       states(find(inttoboolIn(SleepState.timestamps.NREM))) = 3;
+       states(find(inttoboolIn(SleepState.timestamps.REM))) = 5;
     end
 
 else
@@ -615,12 +654,52 @@ else
     if exist([baseName,'.SleepState.states.mat'],'file')
        load([baseName,'.SleepState.states.mat'])
        
-       stateslen = max([max(max(SleepState.ints.NREMstate)) max(max(SleepState.ints.REMstate)) max(max(SleepState.ints.WAKEstate)) max(max(SleepState.ints.MAstate))]); 
+%        stateslen = max([max(max(SleepState.ints.NREMstate)) max(max(SleepState.ints.REMstate)) max(max(SleepState.ints.WAKEstate)) max(max(SleepState.ints.MAstate))]); 
+%        states = zeros(1,stateslen);
+%        states(find(inttoboolIn(SleepState.ints.WAKEstate))) = 1;
+%        states(find(inttoboolIn(SleepState.ints.MAstate))) = 2;
+%        states(find(inttoboolIn(SleepState.ints.NREMstate))) = 3;
+%        states(find(inttoboolIn(SleepState.ints.REMstate))) = 5;
+
+        % changed by Hiro Miyawaki, Dec 21, 2018
+        
+        if ~isfield(SleepState,'timestamps')
+
+            if ~isempty(SleepState.ints.MAstate)
+                disp('WARNING : MA is merged to WAKE');
+            end
+            SleepState.timestamps.WAKE=sortrows([SleepState.ints.WAKEstate;SleepState.ints.MAstate]);
+            SleepState.timestamps.MA=[];
+            SleepState.timestamps.NREM=SleepState.ints.NREMstate;
+            SleepState.timestamps.IS=[];
+            SleepState.timestamps.REM=SleepState.ints.REMstate;
+            
+            scored=sortrows([SleepState.timestamps.NREM;
+                            SleepState.timestamps.REM;
+                            SleepState.timestamps.WAKE;
+                            SleepState.timestamps.MA;
+                            SleepState.timestamps.IS]);
+            
+            unScoreID=find(scored(1:end-1,2) ~= scored(2:end,1)); 
+            if ~isempty(unScoreID)
+                disp('WARNING : Assuming unscored epochs are WAKE')
+                unscored=[scored(unScoreID,2),scored(unScoreID+1,1)];
+                SleepState.timestamps.WAKE=sortrows([SleepState.timestamps.WAKE;unscored]);
+            end
+            
+        end
+        stateslen = max([SleepState.timestamps.NREM(:);...
+                       SleepState.timestamps.REM(:);...
+                       SleepState.timestamps.WAKE(:);...
+                       SleepState.timestamps.MA(:);...
+                       SleepState.timestamps.IS(:)]); 
        states = zeros(1,stateslen);
-       states(find(inttoboolIn(SleepState.ints.WAKEstate))) = 1;
-       states(find(inttoboolIn(SleepState.ints.MAstate))) = 2;
-       states(find(inttoboolIn(SleepState.ints.NREMstate))) = 3;
-       states(find(inttoboolIn(SleepState.ints.REMstate))) = 5;
+       states(find(inttoboolIn(SleepState.timestamps.IS))) = 2;
+       states(find(inttoboolIn(SleepState.timestamps.MA))) = 4;
+       states(find(inttoboolIn(SleepState.timestamps.WAKE))) = 1;
+       states(find(inttoboolIn(SleepState.timestamps.NREM))) = 3;
+       states(find(inttoboolIn(SleepState.timestamps.REM))) = 5;
+       
        states = cat(2,states,zeros(1,length(StateInfo.fspec{1}.to)-length(states)));
     end
     
@@ -640,21 +719,27 @@ end
 
 disp('So far so good. Now, loading StateEditor GUI. This is going to be great!');
 
-if supressGUI == 1
+if supressGUI == 1Assumed
+    if nargout>0
+        figHandle=[];
+    end    
     return;
 else
-    StateEditorSetup(StateInfo.fspec, StateInfo.motion, states, rawEeg, baseName, FO, eegFS);
+    fh=StateEditorSetup(StateInfo.fspec, StateInfo.motion, states, rawEeg, baseName, FO, eegFS);
 end
 
 if exist([baseName,'-states.mat'],'file')
     LoadStatesAutoNoMsgs
 end
 
+if nargout>0
+    figHandle=fh;
+end
 
 end%function end
 
 
-function StateEditorSetup(f, MP, States, eeg, baseName, FO, eegFS)
+function figHandle=StateEditorSetup(f, MP, States, eeg, baseName, FO, eegFS)
 
 if ~iscell(f)
     a = f; e = eeg;
@@ -1102,8 +1187,9 @@ set(FO.max,'xticklabel',num2str(get(FO.max,'xtick')'));
 set(FO.sax{end},'xticklabel',num2str(get(FO.sax{end},'xtick')'));
 %set(FO.eax{end},'xticklabel',num2str(get(FO.eax{end},'xtick')'));
 
-
-
+    if nargout>0
+        figHandle=FO.fig;
+    end
 end
 
 
@@ -2186,7 +2272,12 @@ sints = IDXtoINT_In( FO.States,5);%convert to start-stop intervals
 NREMints = sints{3};
 REMints = sints{5};
 WAKEints = sints{1};
-[SleepState_new,~] = StatesToFinalScoring(NREMints,WAKEints,REMints);% FO.States
+% [SleepState_new,~] = StatesToFinalScoring(NREMints,WAKEints,REMints);% FO.States
+
+% % changed by Hiro Miyawaki, Dec 21, 2018 
+MAints = sints{2};
+ISints = sints{4};
+[SleepState_new,~] = StatesToFinalScoring(NREMints,WAKEints,REMints,MAints,ISints);% FO.States
 
 % save to SleepState.states .mat file with proper formatting etc
 SleepState = bz_LoadStates(basePath,'SleepState'); %load old scoring
@@ -2204,6 +2295,7 @@ if ~isfield(SleepState,'AutoScoreInts') && strcmp(SleepState.detectorname,'Sleep
     SleepState.AutoScoreInts = SleepState.ints;
 end
 SleepState.ints = SleepState_new.ints;
+SleepState.timestamps = SleepState_new.timestamps;
 
 %Save the results!
 save(fullfile(basePath,[baseName '.SleepState.states.mat']),'SleepState')

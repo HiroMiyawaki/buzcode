@@ -1,4 +1,7 @@
-function [SleepState,durationparams] = StatesToFinalScoring(NREMints,WAKEints,REMints)
+function [SleepState,durationparams] = StatesToFinalScoring(NREMints,WAKEints,REMints,MAints,ISints)
+
+if ~exist('MAints','var'); MAints=[]; end
+if ~exist('ISints','var'); ISints=[]; end
 
 minPacketDuration = 30;
 maxMicroarousalDuration = 100;
@@ -61,6 +64,12 @@ SleepState.ints.NREMpacket = packetintervals;
 SleepState.ints.MAstate = MAIntervals;
 SleepState.ints.MA_REM = MA_REM;
 
+%% added by Hiro Miyawaki at Dec 21, 2018
+SleepState.timestamps.WAKE = WAKEints;
+SleepState.timestamps.MA = MAints;
+SleepState.timestamps.NREM = NREMints;
+SleepState.timestamps.IS = ISints;
+SleepState.timestamps.REM = REMints;
 
 
 
