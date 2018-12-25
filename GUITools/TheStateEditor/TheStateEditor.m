@@ -184,7 +184,7 @@ if ~exist('spikeInfo', 'var')
     spikeInfo = 0;
 end
 
-[FO.basePath,FO.baseName]=fileparts(baseName)
+[FO.basePath,FO.baseName]=fileparts(baseName);
 %These parameters are passed through all functions
 FO.downsampleGoal = 312.5;% display Hz goal, to save memory... will calculate downsample factor to match (ie 4 if 1250hz lfp file)
 % FO.baseName = baseName;
@@ -328,8 +328,8 @@ if FileExistsIn([baseName,'.eegstates.mat'])
                        SleepState.timestamps.MA(:);...
                        SleepState.timestamps.IS(:)]); 
        states = zeros(1,stateslen);
-       states(find(inttoboolIn(SleepState.timestamps.IS))) = 2;
-       states(find(inttoboolIn(SleepState.timestamps.MA))) = 4;
+       states(find(inttoboolIn(SleepState.timestamps.IS))) = 4;
+       states(find(inttoboolIn(SleepState.timestamps.MA))) = 2;
        states(find(inttoboolIn(SleepState.timestamps.WAKE))) = 1;
        states(find(inttoboolIn(SleepState.timestamps.NREM))) = 3;
        states(find(inttoboolIn(SleepState.timestamps.REM))) = 5;
@@ -694,8 +694,8 @@ else
                        SleepState.timestamps.MA(:);...
                        SleepState.timestamps.IS(:)]); 
        states = zeros(1,stateslen);
-       states(find(inttoboolIn(SleepState.timestamps.IS))) = 2;
-       states(find(inttoboolIn(SleepState.timestamps.MA))) = 4;
+       states(find(inttoboolIn(SleepState.timestamps.IS))) = 4;
+       states(find(inttoboolIn(SleepState.timestamps.MA))) = 2;
        states(find(inttoboolIn(SleepState.timestamps.WAKE))) = 1;
        states(find(inttoboolIn(SleepState.timestamps.NREM))) = 3;
        states(find(inttoboolIn(SleepState.timestamps.REM))) = 5;
@@ -715,6 +715,11 @@ if eegFS>FO.downsampleGoal;
     FO.downsample = round(eegFS/FO.downsampleGoal);
 else
     FO.downsample = 1;
+end
+
+%added by Hiro Miyawaki, Dec 25, 2018
+for i=1:length(rawEeg)
+    FO.eegYlim{i}=prctile(rawEeg{i},[0.05,99.95]);
 end
 
 disp('So far so good. Now, loading StateEditor GUI. This is going to be great!');
@@ -1048,8 +1053,10 @@ for i = 1:nCh
     set(FO.eax{i}, 'Color', [0 0 0], 'XColor', 'b');
     %   FO.Eplot{i} = plot(eegX, FO.eeg{i});
     ylabel('Eeg');
-    l1 = [min(get(FO.Eplot{i}, 'YData')), max(get(FO.Eplot{i}, 'YData'))];
-    ylim(l1);
+%     l1 = [min(get(FO.Eplot{i}, 'YData')), max(get(FO.Eplot{i}, 'YData'))];
+%     ylim(l1);
+    ylim(FO.eegYlim{i});
+    
     FO.zoomE = zoom;
     setAxesZoomMotion(FO.zoomE, FO.eax{i}, 'horizontal');
     FO.panE = pan;
@@ -1161,11 +1168,13 @@ FO.Transitions = [];
 FO.TransHistoryTracker = [];
 FO.saxYLim = [min(FO.fo), max(FO.fo)];
 FO.mpYLim = get(FO.max, 'YLim');
-a = [];
-for i = 1:length(nCh)
-    a = [a; min(FO.eeg{i}), max(FO.eeg{i})];
-end
-FO.eegYLim = [min(a(:, 1)), max(a(:, 2))];
+
+%disabpled by Hiro Miyawaki at Dec 25, 2018
+% a = [];
+% for i = 1:length(nCh)
+%     a = [a; min(FO.eeg{i}), max(FO.eeg{i})];
+% end
+% FO.eegYLim = [min(a(:, 1)), max(a(:, 2))];
 
 
 %% BW speeding things up... didn't change anything above to be safe
@@ -1520,7 +1529,9 @@ highMargin = high + 60;
 for i = 1:FO.nCh
     set(FO.Eplot{i}, 'XData', eegX(eegX >= lowMargin & eegX <= highMargin), 'YData', eeg{i}(eegX >= lowMargin & eegX <= highMargin));
     l1 = [min(eeg{i}(eegX >= low & eegX <= high)), max(eeg{i}(eegX >= low & eegX <= high))];
-    set(FO.eax{i}, 'YLim', l1);
+%     set(FO.eax{i}, 'YLim', l1);
+    %changed by Hiro Miyawaki, Dec 25, 2018
+     set(FO.eax{i}, 'YLim',FO.eegYlim{i});
     set(FO.eax{i}, 'XLim', [pos - FO.eegShow/2, pos + FO.eegShow/2]);
 end
 
@@ -3509,8 +3520,11 @@ else
         axes(FO.eax{i});
         hold on;
         yl = y;
-        yl(yl == 0) = FO.eegYLim(1) - 10;
-        yl(yl == 1) = FO.eegYLim(2) + 10;
+%         yl(yl == 0) = FO.eegYLim(1) - 10;
+%         yl(yl == 1) = FO.eegYLim(2) + 10;
+        % changed by Hiro Miyawaki, Dec 25, 2018
+        yl(yl == 0) = FO.eegYLim{i}(1) - 10;
+        yl(yl == 1) = FO.eegYLim{i}(2) + 10;
         if linesExist == 0
             FO.CurrEventLines{panelN} = plot(z, yl , ':m', 'LineWidth', 2);
         else
