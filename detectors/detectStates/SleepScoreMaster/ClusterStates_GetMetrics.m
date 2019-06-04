@@ -66,7 +66,8 @@ broadbandSlowWave = zFFTspec*SWweights';
 smoothfact = 10; %units of si_FFT
 thsmoothfact = 10; %used to be 15
 
-broadbandSlowWave = smooth(broadbandSlowWave,smoothfact);
+% broadbandSlowWave = smooth(broadbandSlowWave,smoothfact);
+broadbandSlowWave = Smooth(broadbandSlowWave,smoothfact);
 broadbandSlowWave = (broadbandSlowWave-min(broadbandSlowWave))./max(broadbandSlowWave-min(broadbandSlowWave));
 
  
@@ -88,13 +89,15 @@ allpower = sum((thFFTspec),1);
 thpower = sum((thFFTspec(thfreqs,:)),1);
 
 thratio = thpower./allpower;    %Narrowband Theta
-thratio = smooth(thratio,thsmoothfact);
+% thratio = smooth(thratio,thsmoothfact);
+thratio = Smooth(thratio,thsmoothfact);
 thratio = (thratio-min(thratio))./max(thratio-min(thratio));
  
 %% EMG
 dtEMG = 1/EMG.samplingFrequency;
 t_EMG = (1:length(EMG.data))*dtEMG;
-EMG = smooth(EMG.data,smoothfact/dtEMG);
+% EMG = smooth(EMG.data,smoothfact/dtEMG);
+EMG = Smooth(EMG.data,smoothfact/dtEMG);
 EMG = (EMG-min(EMG))./max(EMG-min(EMG));
 
 reclength = round(t_EMG(end));

@@ -192,13 +192,14 @@ bz_sleepstatepath = fullfile(savefolder,[recordingname,'.SleepState.states.mat']
 
 
 %% Get channels not to use
-parameters = bz_getSessionInfo(basePath);
+% parameters = bz_getSessionInfo(basePath);
+parameters = bz_getSessionInfo(basePath,'noPrompts',noPrompts);
 if exist(sessionmetadatapath,'file')%bad channels is an ascii/text file where all lines below the last blank line are assumed to each have a single entry of a number of a bad channel (base 0)
     load(sessionmetadatapath)
     rejectChannels = [rejectChannels SessionMetadata.ExtracellEphys.BadChannels];
 elseif isfield(parameters,'badchannels')
     rejectChannels = [rejectChannels parameters.badchannels]; %get badchannels from the .xml
-else
+elseif isempty(rejectChannels)
     display('No baseName.SessionMetadata.mat, no badchannels in your xml - so no rejected channels')
 end
 
@@ -208,7 +209,7 @@ end
 % (high frequency correlation signal = high EMG).  
 % Schomburg E.W. Neuron 84, 470?485. 2014)
 EMGFromLFP = bz_EMGFromLFP(basePath,'restrict',scoretime,'overwrite',overwrite,...
-                                     'rejectChannels',rejectChannels);
+                                     'rejectChannels',rejectChannels,'noPrompts',noPrompts);
 
 %% DETERMINE BEST SLOW WAVE AND THETA CHANNELS
 %Determine the best channels for Slow Wave and Theta separation.
@@ -217,7 +218,7 @@ SleepScoreLFP = PickSWTHChannel(basePath,...
                             figloc,scoretime,SWWeightsName,...
                             Notch60Hz,NotchUnder3Hz,NotchHVS,NotchTheta,...
                             SWChannels,ThetaChannels,rejectChannels,...
-                            overwrite);
+                            overwrite,noPrompts);
 
 %% CLUSTER STATES BASED ON SLOW WAVE, THETA, EMG
 
@@ -247,7 +248,8 @@ SleepState.detectorparams.SWchannum = SleepScoreLFP.SWchanID;
 SleepState.detectorparams.THchannum = SleepScoreLFP.THchanID;
 SleepState.detectorparams.durationparams = durationparams;
 SleepState.detectorname = 'SleepScoreMaster';
-SleepState.detectiondate = today;
+% SleepState.detectiondate = today;
+SleepState.detectiondate = datestr(now,'yyyy-mm-dd');
 save(bz_sleepstatepath,'SleepState');
 
 display(['Sleep Score ',recordingname,': Complete!']);

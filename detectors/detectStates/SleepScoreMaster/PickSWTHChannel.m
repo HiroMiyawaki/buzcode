@@ -1,14 +1,20 @@
-function [SleepScoreLFP] = PickSWTHChannel(basePath,figfolder,scoretime,SWWeightsName,Notch60Hz,NotchUnder3Hz,NotchHVS,NotchTheta,SWChannels,ThetaChannels,rejectchannels,OVERWRITE);
+function [SleepScoreLFP] = PickSWTHChannel(basePath,figfolder,scoretime,SWWeightsName,Notch60Hz,NotchUnder3Hz,NotchHVS,NotchTheta,SWChannels,ThetaChannels,rejectchannels,OVERWRITE,noPrompts);
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 %
 %% Buzcode name of the SleepScoreLFP.LFP.mat file
+if strcmp(basePath(end),'/');basePath(end)=[];end
 [datasetfolder,recordingname,extension] = fileparts(basePath);
 recordingname = [recordingname extension];
 
 matfilename = fullfile(basePath,[recordingname,'.SleepScoreLFP.LFP.mat']);
 
 saveFiles = true;
+%%
+if ~exist('noPrompts','var')
+    noPrompts=false;
+end
+
 %% Check if SleepScoreLFP has already been claculated for this recording
 %If the SleepScoreLFP file already exists, load and return with SleepScoreLFP in hand
 if exist(matfilename,'file') && ~OVERWRITE
@@ -35,7 +41,7 @@ else
 end
 
 %% FMA
-Par = bz_getSessionInfo(basePath);
+Par = bz_getSessionInfo(basePath,'noPrompts',noPrompts);
 Fs = Par.lfpSampleRate; % Hz, LFP sampling rate
 nChannels = Par.nChannels;
 
@@ -164,7 +170,8 @@ parfor idx = 1:numSWChannels;
   
     %% Calculate per-bin weights onto SlowWave
     broadbandSlowWave = zFFTspec*SWweights';
-    broadbandSlowWave = smooth(broadbandSlowWave,smoothfact);
+%     broadbandSlowWave = smooth(broadbandSlowWave,smoothfact);
+    broadbandSlowWave = Smooth(broadbandSlowWave,smoothfact);
     broadbandSlowWave = (broadbandSlowWave-min(broadbandSlowWave))./max(broadbandSlowWave-min(broadbandSlowWave));
 
     %% Histogram and diptest of Slow Wave Power
@@ -204,7 +211,8 @@ parfor idx = 1:numThetaChannels;
     allpower = sum((thFFTspec),1);
 
     thratio = thpower./allpower;    %Narrowband Theta
-    thratio = smooth(thratio,thsmoothfact);
+%     thratio = smooth(thratio,thsmoothfact);
+    thratio = Smooth(thratio,thsmoothfact);
     thratio = (thratio-min(thratio))./max(thratio-min(thratio));
     
     %% Histogram and diptest of Theta
@@ -343,7 +351,8 @@ saveas(thfig,[figfolder,recordingname,'_FindBestTH'],'jpeg')
      %[COEFF, SCORE, LATENT] = pca(zFFTspec);
     %broadbandSlowWave = SCORE(:,1);
      broadbandSlowWave = zFFTspec*SWweights';
-     broadbandSlowWave = smooth(broadbandSlowWave,smoothfact);
+%      broadbandSlowWave = smooth(broadbandSlowWave,smoothfact);
+     broadbandSlowWave = Smooth(broadbandSlowWave,smoothfact);
      broadbandSlowWave = (broadbandSlowWave-min(broadbandSlowWave))./max(broadbandSlowWave-min(broadbandSlowWave));
 
 chanfig =figure('visible','off');
@@ -372,7 +381,8 @@ chanfig =figure('visible','off');
     allpower = sum((thFFTspec),1);
 
     thratio = thpower./allpower;    %Narrowband Theta
-    thratio = smooth(thratio,thsmoothfact);
+%     thratio = smooth(thratio,thsmoothfact);
+    thratio = Smooth(thratio,thsmoothfact);
     thratio = (thratio-min(thratio))./max(thratio-min(thratio));
     
 subplot(5,1,4)
