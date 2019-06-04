@@ -191,7 +191,7 @@ SR         = par.lfpSampleRate; % lfp sampling rate
 nChan      = par.nChannels;     % number of channels in the recording
 
 % 2) Channels
-if ~all(Channels > 0 & Channels < nChan)
+if ~all(Channels > 0 & Channels <= nChan)
     error(['%s: incompatible input for 2nd argument (Channels)\n', ...
             '\tAccording to the .xml file, the user did not supply\n', ...
             '\ta valid list of channels.\n'],mfname);
@@ -745,7 +745,8 @@ for ii = 1:Nepochs
         MaxCounter              = MaxCounter + 1;
         featureTs(MaxCounter)   = maxSample;
         swDiffAll(MaxCounter)   = tempswDiff;
-        ripPowerAll(MaxCounter) = max(ripPower0(maxSample-HalfWinSize:maxSample+HalfWinSize,1));
+%         ripPowerAll(MaxCounter) = max(ripPower0(maxSample-HalfWinSize:maxSample+HalfWinSize,1));
+        ripPowerAll(MaxCounter) = max(ripPower0(max(maxSample-HalfWinSize,1):min(maxSample+HalfWinSize,epoch_inds(2)),1));
     end
 end
 featureTs   = featureTs(1:MaxCounter);

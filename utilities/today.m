@@ -1,5 +1,5 @@
 function date=today(type)
-    if strcmpi(type,'datetime')
+    if exist('type','var') && strcmpi(type,'datetime')
         date=datetime('now','Format','yyyy-MM-dd');
     else
         date=floor(now);
